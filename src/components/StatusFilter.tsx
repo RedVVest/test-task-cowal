@@ -22,6 +22,7 @@ export default function StatusFilter({ value, onChange }: Props) {
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
+      style={styles.scroll}
       contentContainerStyle={styles.container}
     >
       {OPTIONS.map((option) => {
@@ -43,10 +44,14 @@ export default function StatusFilter({ value, onChange }: Props) {
 }
 
 const styles = StyleSheet.create({
+  scroll: {
+    flexGrow: 0,
+  },
   container: {
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     gap: spacing.sm,
+    alignItems: 'center',
   },
   chip: {
     borderRadius: 999,
