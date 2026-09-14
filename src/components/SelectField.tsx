@@ -31,14 +31,19 @@ export default function SelectField<T extends string>({
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
-      <Pressable style={styles.field} onPress={() => setOpen(true)}>
+      <Pressable
+        style={styles.field}
+        onPress={() => setOpen(true)}
+        accessibilityRole="button"
+        accessibilityLabel={label}
+      >
         <Text style={styles.value}>{selected?.label ?? ''}</Text>
         <Text style={styles.chevron}>▾</Text>
       </Pressable>
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
         <Pressable style={styles.backdrop} onPress={() => setOpen(false)}>
-          <View style={styles.sheet}>
+          <Pressable style={styles.sheet} onPress={() => {}}>
             <Text style={styles.sheetTitle}>{label}</Text>
             <FlatList
               data={options}
@@ -46,7 +51,12 @@ export default function SelectField<T extends string>({
               renderItem={({ item }) => {
                 const active = item.value === value;
                 return (
-                  <Pressable style={styles.option} onPress={() => handleSelect(item.value)}>
+                  <Pressable
+                    style={styles.option}
+                    onPress={() => handleSelect(item.value)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: active }}
+                  >
                     <Text style={[styles.optionText, active && styles.optionActive]}>
                       {item.label}
                     </Text>
@@ -55,7 +65,7 @@ export default function SelectField<T extends string>({
                 );
               }}
             />
-          </View>
+          </Pressable>
         </Pressable>
       </Modal>
     </View>
