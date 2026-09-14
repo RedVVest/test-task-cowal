@@ -10,7 +10,7 @@ export type NewOrderInput = Pick<
 >;
 
 type Action =
-  | { type: 'ADD_ORDER'; order: Order }
+  | { type: 'ADD_ORDER'; input: NewOrderInput }
   | { type: 'CYCLE_STATUS'; id: string };
 
 interface OrdersContextValue {
@@ -21,10 +21,22 @@ interface OrdersContextValue {
 
 const OrdersContext = createContext<OrdersContextValue | null>(null);
 
+function generateId(): string {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 function ordersReducer(state: Order[], action: Action): Order[] {
   switch (action.type) {
-    case 'ADD_ORDER':
-      return [action.order, ...state];
+    case 'ADD_ORDER': {
+      const order: Order = {
+        ...action.input,
+        id: generateId(),
+        number: nextOrderNumber(state),
+        status: 'new',
+        createdAt: new Date().toISOString(),
+      };
+      return [order, ...state];
+    }
     case 'CYCLE_STATUS':
       return state.map((order) =>
         order.id === action.id ? { ...order, status: nextStatus(order.status) } : order,
@@ -34,26 +46,12 @@ function ordersReducer(state: Order[], action: Action): Order[] {
   }
 }
 
-function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-}
-
 export function OrdersProvider({ children }: { children: React.ReactNode }) {
   const [orders, dispatch] = useReducer(ordersReducer, initialOrders as Order[]);
 
-  const addOrder = useCallback(
-    (input: NewOrderInput) => {
-      const order: Order = {
-        ...input,
-        id: generateId(),
-        number: nextOrderNumber(orders),
-        status: 'new',
-        createdAt: new Date().toISOString(),
-      };
-      dispatch({ type: 'ADD_ORDER', order });
-    },
-    [orders],
-  );
+  const addOrder = useCallback((input: NewOrderInput) => {
+    dispatch({ type: 'ADD_ORDER', input });
+  }, []);
 
   const cycleStatus = useCallback((id: string) => {
     dispatch({ type: 'CYCLE_STATUS', id });
