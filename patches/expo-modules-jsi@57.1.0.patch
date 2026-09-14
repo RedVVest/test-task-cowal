@@ -1,37 +1,85 @@
-diff --git a/apple/Package.swift b/apple/Package.swift
-index 77b0525ad0b34e5bda544da8fe965043d638f333..3753f1551d66a9f78a87a5b9c275dc29f807b2db 100644
---- a/apple/Package.swift
-+++ b/apple/Package.swift
-@@ -91,6 +91,7 @@ let package = Package(
-         .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
-         // https://github.com/swiftlang/swift-evolution/blob/main/proposals/0470-isolated-conformances.md
-         .enableUpcomingFeature("InferIsolatedConformances"),
-+        .enableUpcomingFeature("BareSlashRegexLiterals"),
+diff --git a/apple/Sources/ExpoModulesJSI/Runtime/JavaScriptRuntime.swift b/apple/Sources/ExpoModulesJSI/Runtime/JavaScriptRuntime.swift
+index 3d796eea39a39f6b20a9ebb83b70d7eb2c8b6104..8932f322a1365a50cab6c8776a0f3bd4eccda854 100644
+--- a/apple/Sources/ExpoModulesJSI/Runtime/JavaScriptRuntime.swift
++++ b/apple/Sources/ExpoModulesJSI/Runtime/JavaScriptRuntime.swift
+@@ -185,12 +185,12 @@ open class JavaScriptRuntime: Equatable, Identifiable, @unchecked Sendable {
+       resultPtr: UnsafeMutablePointer<facebook.jsi.Value>
+     ) -> Bool {
+       let propertyName = String(cString: propertyName)
+-      nonisolated(unsafe) let resultPtr = resultPtr
++      let resultPtr = UncheckedSendable(resultPtr)
  
-         .unsafeFlags([
-           "-enable-library-evolution",
-@@ -150,7 +151,7 @@ let package = Package(
-       path: "Benchmarks",
-     ),
-   ] + testFrameworks.binaryTargets,
--  swiftLanguageModes: [.v6],
-+  swiftLanguageModes: [.v5],
-   cxxLanguageStandard: .cxx20
- )
+       return withGuaranteedContext(context) { (context: HostObjectContext, runtime) in
+         return JavaScriptActor.assumeIsolated {
+           return forwardingSwiftErrorsToJS(runtime: runtime) {
+-            try context.get(propertyName).writeJSIValue(to: resultPtr)
++            try context.get(propertyName).writeJSIValue(to: resultPtr.value)
+           }
+         }
+       }
+@@ -774,19 +774,19 @@ private func createFunctionClosure(
+     // synchronous call, so the `nonisolated(unsafe)` capture is sound. This removes a per-call class
+     // allocation + retain/release + dealloc that profiling showed dominating the no-op `@JS` host-call
+     // floor.
+-    nonisolated(unsafe) let thisPtr = thisPtr
+-    nonisolated(unsafe) let argumentsPtr = argumentsPtr
+-    nonisolated(unsafe) let resultPtr = resultPtr
++    let thisPtr = UncheckedSendable(thisPtr)
++    let argumentsPtr = UncheckedSendable(argumentsPtr)
++    let resultPtr = UncheckedSendable(resultPtr)
  
-diff --git a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptPromise.swift b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptPromise.swift
-index 434c379e575ac5310b7a97fe86fad12c41134a54..a3f3f5ab948f924efeed569e03b2417511754292 100644
---- a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptPromise.swift
-+++ b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptPromise.swift
-@@ -36,6 +36,8 @@ public struct JavaScriptPromise: JavaScriptType, ~Copyable {
-     let resolveFunction = JavaScriptValue.Ref()
-     let rejectFunction = JavaScriptValue.Ref()
+     // See `withGuaranteedContext` for why neither the context nor the runtime is retained here, and
+     // why the result is written to the caller's slot instead of being returned.
+     return withGuaranteedContext(context) { (context: HostFunctionContext, runtime) in
+       return JavaScriptActor.assumeIsolated {
+         return forwardingSwiftErrorsToJS(runtime: runtime) {
+-          let this = UnsafeMutablePointer(mutating: thisPtr).move()
+-          let arguments = JavaScriptValuesBuffer(runtime, start: argumentsPtr, count: argumentsCount)
++          let this = UnsafeMutablePointer(mutating: thisPtr.value).move()
++          let arguments = JavaScriptValuesBuffer(runtime, start: argumentsPtr.value, count: argumentsCount)
+           let thisValue = JavaScriptValue(runtime, this)
+-          try context.call(thisValue, consume arguments).writeJSIValue(to: resultPtr)
++          try context.call(thisValue, consume arguments).writeJSIValue(to: resultPtr.value)
+         }
+       }
+     }
+@@ -817,18 +817,18 @@ private func createFunctionClosure(
+     // handed in as a borrowed `JavaScriptUnownedValue` pointing straight at the C++-owned `this` slot:
+     // it is not moved out and no owning `JavaScriptValue` is allocated, so the closure avoids the
+     // per-call `weak`-runtime form/destroy and heap object that the owning `this` pays.
+-    nonisolated(unsafe) let thisPtr = thisPtr
+-    nonisolated(unsafe) let argumentsPtr = argumentsPtr
+-    nonisolated(unsafe) let resultPtr = resultPtr
++    let thisPtr = UncheckedSendable(thisPtr)
++    let argumentsPtr = UncheckedSendable(argumentsPtr)
++    let resultPtr = UncheckedSendable(resultPtr)
  
-+    nonisolated init() {}
+     // See `withGuaranteedContext` for why neither the context nor the runtime is retained here, and
+     // why the result is written to the caller's slot instead of being returned.
+     return withGuaranteedContext(context) { (context: UnownedThisHostFunctionContext, runtime) in
+       return JavaScriptActor.assumeIsolated {
+         return forwardingSwiftErrorsToJS(runtime: runtime) {
+-          let arguments = JavaScriptValuesBuffer(runtime, start: argumentsPtr, count: argumentsCount)
+-          let thisValue = JavaScriptUnownedValue(runtime.pointee, thisPtr)
+-          try context.call(thisValue, consume arguments).writeJSIValue(to: resultPtr)
++          let arguments = JavaScriptValuesBuffer(runtime, start: argumentsPtr.value, count: argumentsCount)
++          let thisValue = JavaScriptUnownedValue(runtime.pointee, thisPtr.value)
++          try context.call(thisValue, consume arguments).writeJSIValue(to: resultPtr.value)
+         }
+       }
+     }
+@@ -855,3 +855,11 @@ extension JavaScriptRuntime {
+     }
+   }
+ }
 +
-     func allowRelease() {
-       object.release()
-       resolveFunction.release()
++private struct UncheckedSendable<T>: @unchecked Sendable {
++  let value: T
++
++  init(_ value: T) {
++    self.value = value
++  }
++}
 diff --git a/apple/Sources/ExpoModulesJSI-Cxx/include/RuntimeScheduler.h b/apple/Sources/ExpoModulesJSI-Cxx/include/RuntimeScheduler.h
 index 6115e87a6e430f55570fbf759283dca0cca1ee80..957527c85379285d9ee5fc7974ad01e94ee12bc5 100644
 --- a/apple/Sources/ExpoModulesJSI-Cxx/include/RuntimeScheduler.h
