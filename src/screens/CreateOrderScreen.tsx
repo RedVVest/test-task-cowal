@@ -61,6 +61,8 @@ export default function CreateOrderScreen({ navigation }: RootStackScreenProps<'
           value={values.customerName}
           onChangeText={(text) => setField('customerName', text)}
           placeholder="Иван Петров"
+          autoCapitalize="words"
+          returnKeyType="next"
           error={errors.customerName}
         />
         <FormField
@@ -68,6 +70,7 @@ export default function CreateOrderScreen({ navigation }: RootStackScreenProps<'
           value={values.address}
           onChangeText={(text) => setField('address', text)}
           placeholder="ул. Ленина, 12, кв. 5"
+          returnKeyType="next"
           error={errors.address}
         />
         <SelectField
@@ -81,7 +84,7 @@ export default function CreateOrderScreen({ navigation }: RootStackScreenProps<'
           value={values.width}
           onChangeText={(text) => setField('width', text)}
           placeholder="1200"
-          keyboardType="numeric"
+          keyboardType="decimal-pad"
           error={errors.width}
         />
         <FormField
@@ -89,13 +92,14 @@ export default function CreateOrderScreen({ navigation }: RootStackScreenProps<'
           value={values.height}
           onChangeText={(text) => setField('height', text)}
           placeholder="1400"
-          keyboardType="numeric"
+          keyboardType="decimal-pad"
           error={errors.height}
         />
 
         <Pressable
           onPress={handleSave}
           style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
+          accessibilityRole="button"
         >
           <Text style={styles.buttonText}>Сохранить</Text>
         </Pressable>

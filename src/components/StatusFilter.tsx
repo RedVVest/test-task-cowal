@@ -31,6 +31,8 @@ export default function StatusFilter({ value, onChange }: Props) {
             key={option.value}
             onPress={() => onChange(option.value)}
             style={[styles.chip, active && styles.chipActive]}
+            accessibilityRole="button"
+            accessibilityState={{ selected: active }}
           >
             <Text style={[styles.label, active && styles.labelActive]}>{option.label}</Text>
           </Pressable>

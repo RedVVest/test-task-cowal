@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { RootStackScreenProps } from '../navigation/RootNavigator';
 import { useOrders } from '../context/OrdersContext';
@@ -8,9 +8,16 @@ import { formatDate } from '../utils/date';
 import { windowTypeLabel } from '../utils/windowType';
 import { colors, radius, spacing } from '../theme';
 
-export default function OrderDetailsScreen({ route }: RootStackScreenProps<'OrderDetails'>) {
+export default function OrderDetailsScreen({
+  route,
+  navigation,
+}: RootStackScreenProps<'OrderDetails'>) {
   const { orders, cycleStatus } = useOrders();
   const order = orders.find((o) => o.id === route.params.orderId);
+
+  useLayoutEffect(() => {
+    if (order) navigation.setOptions({ title: order.number });
+  }, [navigation, order]);
 
   if (!order) {
     return (
@@ -35,6 +42,7 @@ export default function OrderDetailsScreen({ route }: RootStackScreenProps<'Orde
       <Pressable
         onPress={() => cycleStatus(order.id)}
         style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
+        accessibilityRole="button"
       >
         <Text style={styles.buttonText}>Изменить статус</Text>
       </Pressable>

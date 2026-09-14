@@ -16,6 +16,7 @@ export default function HomeScreen({ navigation }: RootStackScreenProps<'Home'>)
         <Pressable
           onPress={() => navigation.navigate('CreateOrder')}
           hitSlop={12}
+          accessibilityRole="button"
           accessibilityLabel="Создать заказ"
         >
           <Text style={styles.addButton}>+</Text>

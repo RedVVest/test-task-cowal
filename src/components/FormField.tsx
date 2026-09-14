@@ -1,34 +1,21 @@
 import React from 'react';
-import { KeyboardTypeOptions, StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
 import { colors, radius, spacing } from '../theme';
 
-interface Props {
+interface Props extends Omit<TextInputProps, 'style'> {
   label: string;
-  value: string;
-  onChangeText: (text: string) => void;
   error?: string;
-  placeholder?: string;
-  keyboardType?: KeyboardTypeOptions;
 }
 
-export default function FormField({
-  label,
-  value,
-  onChangeText,
-  error,
-  placeholder,
-  keyboardType,
-}: Props) {
+export default function FormField({ label, error, ...inputProps }: Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
       <TextInput
         style={[styles.input, !!error && styles.inputError]}
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
         placeholderTextColor={colors.muted}
-        keyboardType={keyboardType}
+        accessibilityLabel={label}
+        {...inputProps}
       />
       {!!error && <Text style={styles.error}>{error}</Text>}
     </View>
