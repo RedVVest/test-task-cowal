@@ -10,7 +10,7 @@
 
 ## Запуск
 
-Требуется Node.js 18+ и приложение [Expo Go](https://expo.dev/go) на телефоне либо iOS-симулятор / Android-эмулятор.
+Требуется Node.js 20+ и приложение [Expo Go](https://expo.dev/go) на телефоне либо iOS-симулятор / Android-эмулятор.
 
 ```bash
 npm install
