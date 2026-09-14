@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { FlatList, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, radius, spacing } from '../theme';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { colors, radius, spacing, type } from '../theme';
 
 export interface SelectOption<T extends string> {
   value: T;
@@ -30,7 +30,7 @@ export default function SelectField<T extends string>({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[type.caption, styles.label]}>{label}</Text>
       <Pressable
         style={styles.field}
         onPress={() => setOpen(true)}
@@ -38,33 +38,29 @@ export default function SelectField<T extends string>({
         accessibilityLabel={label}
       >
         <Text style={styles.value}>{selected?.label ?? ''}</Text>
-        <Text style={styles.chevron}>▾</Text>
+        <Text style={styles.chevron}>⌄</Text>
       </Pressable>
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
         <Pressable style={styles.backdrop} onPress={() => setOpen(false)}>
           <Pressable style={styles.sheet} onPress={() => {}}>
-            <Text style={styles.sheetTitle}>{label}</Text>
-            <FlatList
-              data={options}
-              keyExtractor={(item) => item.value}
-              renderItem={({ item }) => {
-                const active = item.value === value;
-                return (
-                  <Pressable
-                    style={styles.option}
-                    onPress={() => handleSelect(item.value)}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected: active }}
-                  >
-                    <Text style={[styles.optionText, active && styles.optionActive]}>
-                      {item.label}
-                    </Text>
-                    {active && <Text style={styles.optionActive}>✓</Text>}
-                  </Pressable>
-                );
-              }}
-            />
+            <View style={styles.grabber} />
+            <Text style={[type.bodyStrong, styles.sheetTitle]}>{label}</Text>
+            {options.map((item, index) => {
+              const active = item.value === value;
+              return (
+                <Pressable
+                  key={item.value}
+                  style={[styles.option, index < options.length - 1 && styles.optionDivider]}
+                  onPress={() => handleSelect(item.value)}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: active }}
+                >
+                  <Text style={[styles.optionText, active && styles.optionActive]}>{item.label}</Text>
+                  {active && <Text style={styles.check}>✓</Text>}
+                </Pressable>
+              );
+            })}
           </Pressable>
         </Pressable>
       </Modal>
@@ -74,63 +70,78 @@ export default function SelectField<T extends string>({
 
 const styles = StyleSheet.create({
   container: {
-    gap: spacing.xs,
+    gap: spacing.xs + 2,
   },
   label: {
-    fontSize: 14,
-    color: colors.text,
+    color: colors.muted,
     fontWeight: '500',
   },
   field: {
+    height: 48,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: radius,
-    backgroundColor: colors.card,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
   },
   value: {
-    fontSize: 16,
+    fontSize: 17,
     color: colors.text,
   },
   chevron: {
-    fontSize: 16,
+    fontSize: 20,
+    lineHeight: 20,
     color: colors.muted,
+    marginTop: -6,
   },
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(20,24,31,0.45)',
     justifyContent: 'flex-end',
   },
   sheet: {
-    backgroundColor: colors.card,
-    borderTopLeftRadius: radius * 2,
-    borderTopRightRadius: radius * 2,
-    paddingVertical: spacing.lg,
-    paddingBottom: spacing.xl * 2,
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: radius.lg + 4,
+    borderTopRightRadius: radius.lg + 4,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.xxl + spacing.sm,
+  },
+  grabber: {
+    alignSelf: 'center',
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.border,
+    marginBottom: spacing.md,
   },
   sheetTitle: {
-    fontSize: 16,
-    fontWeight: '600',
     color: colors.text,
-    paddingHorizontal: spacing.lg,
     paddingBottom: spacing.sm,
   },
   option: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    alignItems: 'center',
+    paddingVertical: spacing.md + 2,
+  },
+  optionDivider: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
   },
   optionText: {
-    fontSize: 16,
+    fontSize: 17,
     color: colors.text,
   },
   optionActive: {
-    color: colors.primary,
+    fontWeight: '600',
+  },
+  check: {
+    fontSize: 17,
+    color: colors.ink,
     fontWeight: '600',
   },
 });

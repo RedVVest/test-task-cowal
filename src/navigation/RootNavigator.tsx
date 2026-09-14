@@ -23,8 +23,11 @@ export default function RootNavigator() {
     <Stack.Navigator
       initialRouteName="Home"
       screenOptions={{
-        headerTintColor: colors.primary,
-        headerTitleStyle: { color: colors.text },
+        headerTintColor: colors.ink,
+        headerTitleStyle: { color: colors.text, fontWeight: '600' },
+        headerStyle: { backgroundColor: colors.bg },
+        headerShadowVisible: false,
+        headerBackButtonDisplayMode: 'minimal',
         contentStyle: { backgroundColor: colors.bg },
       }}
     >

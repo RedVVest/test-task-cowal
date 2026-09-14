@@ -2,30 +2,43 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { OrderStatus } from '../types/order';
 import { statusColor, statusLabel } from '../utils/status';
-import { colors, spacing } from '../theme';
+import { colors, spacing, type } from '../theme';
 
 interface Props {
   status: OrderStatus;
+  size?: 'sm' | 'md';
 }
 
-export default function StatusBadge({ status }: Props) {
+export default function StatusBadge({ status, size = 'sm' }: Props) {
+  const color = statusColor(status);
   return (
-    <View style={[styles.badge, { backgroundColor: statusColor(status) }]}>
-      <Text style={styles.text}>{statusLabel(status)}</Text>
+    <View style={styles.row}>
+      <View style={[styles.dot, size === 'md' && styles.dotMd, { backgroundColor: color }]} />
+      <Text style={[size === 'md' ? type.body : type.caption, styles.label, { color }]}>
+        {statusLabel(status)}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  badge: {
-    alignSelf: 'flex-start',
-    borderRadius: 999,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm - 2,
   },
-  text: {
-    color: colors.white,
-    fontSize: 12,
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  dotMd: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  label: {
     fontWeight: '600',
+    color: colors.text,
   },
 });

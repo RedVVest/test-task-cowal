@@ -1,17 +1,22 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { colors, spacing } from '../theme';
+import { colors, spacing, type } from '../theme';
 
 interface Props {
   label: string;
   value: React.ReactNode;
+  last?: boolean;
 }
 
-export default function DetailRow({ label, value }: Props) {
+export default function DetailRow({ label, value, last }: Props) {
   return (
-    <View style={styles.row}>
-      <Text style={styles.label}>{label}</Text>
-      {typeof value === 'string' ? <Text style={styles.value}>{value}</Text> : value}
+    <View style={[styles.row, !last && styles.divider]}>
+      <Text style={[type.caption, styles.label]}>{label}</Text>
+      {typeof value === 'string' ? (
+        <Text style={[type.body, styles.value]}>{value}</Text>
+      ) : (
+        value
+      )}
     </View>
   );
 }
@@ -19,16 +24,16 @@ export default function DetailRow({ label, value }: Props) {
 const styles = StyleSheet.create({
   row: {
     paddingVertical: spacing.md,
-    borderBottomWidth: 1,
+    gap: 2,
+  },
+  divider: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.border,
-    gap: spacing.xs,
   },
   label: {
-    fontSize: 13,
     color: colors.muted,
   },
   value: {
-    fontSize: 16,
     color: colors.text,
   },
 });

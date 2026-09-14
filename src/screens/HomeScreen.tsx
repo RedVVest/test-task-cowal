@@ -4,7 +4,7 @@ import { RootStackScreenProps } from '../navigation/RootNavigator';
 import { useOrders } from '../context/OrdersContext';
 import OrderCard from '../components/OrderCard';
 import StatusFilter, { StatusFilterValue } from '../components/StatusFilter';
-import { colors, spacing } from '../theme';
+import { colors, radius, spacing, type } from '../theme';
 
 export default function HomeScreen({ navigation }: RootStackScreenProps<'Home'>) {
   const { orders } = useOrders();
@@ -18,8 +18,9 @@ export default function HomeScreen({ navigation }: RootStackScreenProps<'Home'>)
           hitSlop={12}
           accessibilityRole="button"
           accessibilityLabel="Создать заказ"
+          style={({ pressed }) => [styles.addButton, pressed && styles.addButtonPressed]}
         >
-          <Text style={styles.addButton}>+</Text>
+          <Text style={styles.addButtonText}>+</Text>
         </Pressable>
       ),
     });
@@ -42,9 +43,16 @@ export default function HomeScreen({ navigation }: RootStackScreenProps<'Home'>)
             onPress={(order) => navigation.navigate('OrderDetails', { orderId: order.id })}
           />
         )}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[styles.list, visibleOrders.length > 0 && styles.sheet]}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
-        ListEmptyComponent={<Text style={styles.empty}>Нет заказов</Text>}
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Text style={[type.bodyStrong, styles.emptyTitle]}>Нет заказов</Text>
+            <Text style={[type.body, styles.emptyText]}>
+              Нажмите «+», чтобы добавить первый заказ
+            </Text>
+          </View>
+        }
       />
     </View>
   );
@@ -53,25 +61,54 @@ export default function HomeScreen({ navigation }: RootStackScreenProps<'Home'>)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.bg,
   },
   addButton: {
-    fontSize: 28,
-    lineHeight: 32,
-    color: colors.primary,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.ink,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addButtonPressed: {
+    opacity: 0.8,
+  },
+  addButtonText: {
+    color: colors.white,
+    fontSize: 22,
+    lineHeight: 24,
     fontWeight: '500',
+    marginTop: -1,
   },
   list: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.xl,
     flexGrow: 1,
   },
+  sheet: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    overflow: 'hidden',
+    flexGrow: 0,
+  },
   separator: {
-    height: spacing.md,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.border,
+    marginLeft: spacing.lg,
   },
   empty: {
-    textAlign: 'center',
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+    paddingHorizontal: spacing.xl,
+  },
+  emptyTitle: {
+    color: colors.text,
+  },
+  emptyText: {
     color: colors.muted,
-    marginTop: spacing.xl * 2,
-    fontSize: 16,
+    textAlign: 'center',
   },
 });

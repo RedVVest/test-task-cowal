@@ -2,8 +2,9 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Order } from '../types/order';
 import { formatDate } from '../utils/date';
+import { statusColor } from '../utils/status';
 import StatusBadge from './StatusBadge';
-import { colors, radius, spacing } from '../theme';
+import { colors, spacing, type } from '../theme';
 
 interface Props {
   order: Order;
@@ -14,46 +15,54 @@ export default function OrderCard({ order, onPress }: Props) {
   return (
     <Pressable
       onPress={() => onPress(order)}
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+      accessibilityRole="button"
     >
-      <View style={styles.row}>
-        <Text style={styles.number}>{order.number}</Text>
+      <View style={[styles.rail, { backgroundColor: statusColor(order.status) }]} />
+      <View style={styles.body}>
+        <View style={styles.top}>
+          <Text style={[type.bodyStrong, styles.number]}>{order.number}</Text>
+          <Text style={[type.caption, styles.date]}>{formatDate(order.createdAt)}</Text>
+        </View>
+        <Text style={[type.body, styles.customer]} numberOfLines={1}>
+          {order.customerName}
+        </Text>
         <StatusBadge status={order.status} />
       </View>
-      <Text style={styles.customer}>{order.customerName}</Text>
-      <Text style={styles.date}>{formatDate(order.createdAt)}</Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.card,
-    borderRadius: radius,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.lg,
-    gap: spacing.xs,
-  },
-  pressed: {
-    opacity: 0.7,
-  },
   row: {
     flexDirection: 'row',
+    backgroundColor: colors.surface,
+  },
+  pressed: {
+    backgroundColor: colors.fill,
+  },
+  rail: {
+    width: 4,
+  },
+  body: {
+    flex: 1,
+    paddingVertical: spacing.md,
+    paddingLeft: spacing.md,
+    paddingRight: spacing.lg,
+    gap: spacing.xs,
+  },
+  top: {
+    flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'baseline',
   },
   number: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  customer: {
-    fontSize: 15,
     color: colors.text,
   },
   date: {
-    fontSize: 13,
     color: colors.muted,
+  },
+  customer: {
+    color: colors.text,
   },
 });

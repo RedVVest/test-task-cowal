@@ -1,7 +1,7 @@
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { OrderStatus } from '../types/order';
-import { colors, spacing } from '../theme';
+import { colors, radius, spacing } from '../theme';
 
 export type StatusFilterValue = OrderStatus | 'all';
 
@@ -19,58 +19,64 @@ const OPTIONS: { value: StatusFilterValue; label: string }[] = [
 
 export default function StatusFilter({ value, onChange }: Props) {
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      style={styles.scroll}
-      contentContainerStyle={styles.container}
-    >
+    <View style={styles.track}>
       {OPTIONS.map((option) => {
         const active = option.value === value;
         return (
           <Pressable
             key={option.value}
             onPress={() => onChange(option.value)}
-            style={[styles.chip, active && styles.chipActive]}
+            style={[styles.segment, active && styles.segmentActive]}
             accessibilityRole="button"
             accessibilityState={{ selected: active }}
           >
-            <Text style={[styles.label, active && styles.labelActive]}>{option.label}</Text>
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.85}
+              style={[styles.label, active && styles.labelActive]}
+            >
+              {option.label}
+            </Text>
           </Pressable>
         );
       })}
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  scroll: {
-    flexGrow: 0,
+  track: {
+    flexDirection: 'row',
+    backgroundColor: colors.fill,
+    borderRadius: radius.md,
+    padding: 3,
+    marginHorizontal: spacing.lg,
+    marginVertical: spacing.md,
   },
-  container: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    gap: spacing.sm,
+  segment: {
+    flex: 1,
+    height: 32,
+    borderRadius: radius.sm + 1,
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.xs,
   },
-  chip: {
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.card,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-  },
-  chipActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+  segmentActive: {
+    backgroundColor: colors.surface,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
   },
   label: {
-    color: colors.text,
-    fontSize: 14,
+    fontSize: 13,
+    color: colors.muted,
+    fontWeight: '500',
   },
   labelActive: {
-    color: colors.white,
+    color: colors.text,
     fontWeight: '600',
   },
 });

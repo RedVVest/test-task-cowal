@@ -1,19 +1,14 @@
 import React, { useState } from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { RootStackScreenProps } from '../navigation/RootNavigator';
 import { useOrders } from '../context/OrdersContext';
 import FormField from '../components/FormField';
 import SelectField from '../components/SelectField';
+import PrimaryButton from '../components/PrimaryButton';
 import { WINDOW_TYPE_OPTIONS } from '../utils/windowType';
 import { OrderFormErrors, OrderFormValues, validateOrderForm } from '../utils/validation';
-import { colors, radius, spacing } from '../theme';
+import { colors, spacing } from '../theme';
 
 const INITIAL_VALUES: OrderFormValues = {
   customerName: '',
@@ -25,6 +20,7 @@ const INITIAL_VALUES: OrderFormValues = {
 
 export default function CreateOrderScreen({ navigation }: RootStackScreenProps<'CreateOrder'>) {
   const { addOrder } = useOrders();
+  const headerHeight = useHeaderHeight();
   const [values, setValues] = useState<OrderFormValues>(INITIAL_VALUES);
   const [errors, setErrors] = useState<OrderFormErrors>({});
 
@@ -53,9 +49,13 @@ export default function CreateOrderScreen({ navigation }: RootStackScreenProps<'
     <KeyboardAvoidingView
       style={styles.flex}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 96 : 0}
+      keyboardVerticalOffset={headerHeight}
     >
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        style={styles.flex}
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
         <FormField
           label="Имя клиента"
           value={values.customerName}
@@ -79,30 +79,32 @@ export default function CreateOrderScreen({ navigation }: RootStackScreenProps<'
           options={WINDOW_TYPE_OPTIONS}
           onChange={(value) => setField('windowType', value)}
         />
-        <FormField
-          label="Ширина, мм"
-          value={values.width}
-          onChangeText={(text) => setField('width', text)}
-          placeholder="1200"
-          keyboardType="decimal-pad"
-          error={errors.width}
-        />
-        <FormField
-          label="Высота, мм"
-          value={values.height}
-          onChangeText={(text) => setField('height', text)}
-          placeholder="1400"
-          keyboardType="decimal-pad"
-          error={errors.height}
-        />
+        <View style={styles.sizes}>
+          <View style={styles.flex}>
+            <FormField
+              label="Ширина, мм"
+              value={values.width}
+              onChangeText={(text) => setField('width', text)}
+              placeholder="1200"
+              keyboardType="decimal-pad"
+              error={errors.width}
+            />
+          </View>
+          <View style={styles.flex}>
+            <FormField
+              label="Высота, мм"
+              value={values.height}
+              onChangeText={(text) => setField('height', text)}
+              placeholder="1400"
+              keyboardType="decimal-pad"
+              error={errors.height}
+            />
+          </View>
+        </View>
 
-        <Pressable
-          onPress={handleSave}
-          style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
-          accessibilityRole="button"
-        >
-          <Text style={styles.buttonText}>Сохранить</Text>
-        </Pressable>
+        <View style={styles.footer}>
+          <PrimaryButton title="Сохранить" onPress={handleSave} />
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -111,24 +113,18 @@ export default function CreateOrderScreen({ navigation }: RootStackScreenProps<'
 const styles = StyleSheet.create({
   flex: {
     flex: 1,
+    backgroundColor: colors.bg,
   },
   container: {
     padding: spacing.lg,
     gap: spacing.lg,
   },
-  button: {
+  sizes: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    alignItems: 'flex-start',
+  },
+  footer: {
     marginTop: spacing.sm,
-    backgroundColor: colors.primary,
-    borderRadius: radius,
-    paddingVertical: spacing.lg,
-    alignItems: 'center',
-  },
-  buttonPressed: {
-    opacity: 0.8,
-  },
-  buttonText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: '600',
   },
 });
