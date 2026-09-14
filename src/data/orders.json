@@ -1,0 +1,90 @@
+[
+  {
+    "id": "1",
+    "number": "ORD-001",
+    "customerName": "Иван Петров",
+    "address": "ул. Ленина, 12, кв. 5",
+    "windowType": "turn",
+    "width": 1200,
+    "height": 1400,
+    "status": "new",
+    "createdAt": "2026-09-14T09:30:00.000Z"
+  },
+  {
+    "id": "2",
+    "number": "ORD-002",
+    "customerName": "Мария Сидорова",
+    "address": "пр. Мира, 45, кв. 18",
+    "windowType": "tilt_turn",
+    "width": 900,
+    "height": 1500,
+    "status": "in_progress",
+    "createdAt": "2026-09-12T11:00:00.000Z"
+  },
+  {
+    "id": "3",
+    "number": "ORD-003",
+    "customerName": "Алексей Смирнов",
+    "address": "ул. Садовая, 3",
+    "windowType": "sliding",
+    "width": 2400,
+    "height": 2100,
+    "status": "done",
+    "createdAt": "2026-09-05T14:15:00.000Z"
+  },
+  {
+    "id": "4",
+    "number": "ORD-004",
+    "customerName": "Ольга Кузнецова",
+    "address": "ул. Победы, 27, кв. 42",
+    "windowType": "tilt",
+    "width": 600,
+    "height": 800,
+    "status": "new",
+    "createdAt": "2026-09-13T16:45:00.000Z"
+  },
+  {
+    "id": "5",
+    "number": "ORD-005",
+    "customerName": "Дмитрий Волков",
+    "address": "ул. Школьная, 8, кв. 3",
+    "windowType": "turn",
+    "width": 1000,
+    "height": 1200,
+    "status": "in_progress",
+    "createdAt": "2026-09-10T08:20:00.000Z"
+  },
+  {
+    "id": "6",
+    "number": "ORD-006",
+    "customerName": "Елена Новикова",
+    "address": "пер. Цветочный, 14",
+    "windowType": "tilt_turn",
+    "width": 1300,
+    "height": 1450,
+    "status": "done",
+    "createdAt": "2026-08-28T10:00:00.000Z"
+  },
+  {
+    "id": "7",
+    "number": "ORD-007",
+    "customerName": "Сергей Морозов",
+    "address": "ул. Заречная, 51, кв. 7",
+    "windowType": "sliding",
+    "width": 1800,
+    "height": 2000,
+    "status": "in_progress",
+    "createdAt": "2026-09-08T13:30:00.000Z"
+  },
+  {
+    "id": "8",
+    "number": "ORD-008",
+    "customerName": "Анна Лебедева",
+    "address": "ул. Гагарина, 19, кв. 21",
+    "windowType": "turn",
+    "width": 1100,
+    "height": 1300,
+    "status": "new",
+    "createdAt": "2026-09-11T15:10:00.000Z"
+  }
+]
